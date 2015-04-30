@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
     # Use the calibrated Myo gestures to drive the turtle
     def drive(gest):
-	rospy.set_param('~guard_action',gest.data)
+        rospy.set_param('~guard_action',gest.data)
 
         if gest.data == 1: # FIST
 	    turtlebotPub.publish("go back")

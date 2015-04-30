@@ -2,6 +2,7 @@
 #include <tf/transform_listener.h>
 #include <geometry_msgs/Twist.h>
 #include <iostream>
+#include <string>
 
 int main(int argc, char** argv){
     ros::init(argc, argv, "turtlebot_attack");
@@ -9,22 +10,31 @@ int main(int argc, char** argv){
     ros::NodeHandle node;
 
     ros::Publisher turtlebot_vel =
-            node.advertise<geometry_msgs::Twist>("mobile_base/commands/velocity", 10);
-
+    node.advertise<geometry_msgs::Twist>("mobile_base/commands/velocity", 10);
     tf::TransformListener listener;
 
     ros::Rate rate(10.0);
     int counter = 0; // to record the number of times that /ar_marker_4
     // can't be found
 
+    // Trigger for autonomous control
+    std::string control_mode("manual");
     while (node.ok()){
-        tf::StampedTransform transform;
 
-        geometry_msgs::Twist vel_msg;
+        // std:: cout << auto_control << std::endl;
+        ros::param::get("/control_mode", control_mode);
+        std::cout << control_mode << std::endl;
+        
+        if ( control_mode.compare("auto") == 0 ){
 
-        try{
-            listener.lookupTransform("/ar_marker_4", "/base_link",
-                                     ros::Time(0), transform);
+            std::cout << "Auto working" << std::endl;
+            tf::StampedTransform transform;
+
+            geometry_msgs::Twist vel_msg;
+
+            try{
+                listener.lookupTransform("/ar_marker_4", "/base_link",
+                   ros::Time(0), transform);
             counter == 0; // set counter back to 0 once find /ar_marker_4
         }
         catch (tf::TransformException &ex) {
@@ -43,12 +53,13 @@ int main(int argc, char** argv){
         }
 
         vel_msg.angular.z = 0.3 * atan2(transform.getOrigin().y(),
-                                        transform.getOrigin().x());
-        vel_msg.linear.x = 0.4 * sqrt(pow(transform.getOrigin().x(), 2) +
-                                      pow(transform.getOrigin().y(), 2));
+            transform.getOrigin().x());
+        vel_msg.linear.x = 0.2 * sqrt(pow(transform.getOrigin().x(), 2) +
+          pow(transform.getOrigin().y(), 2));
         turtlebot_vel.publish(vel_msg);
-
-        rate.sleep();
     }
-    return 0;
+
+    rate.sleep();
+}
+return 0;
 };
