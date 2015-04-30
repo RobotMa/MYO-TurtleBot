@@ -303,7 +303,7 @@ class MyoRaw(object):
                 ## Print val for debug
 		print("typ: 1 on arm | 2 removed from arm | 3 pose")
                 print(typ)
-		print("val: 1 go back | 2 go left | 3 go right | 4 go forward | 5 unknown")
+		print("val: 1 go back | 2 go left | 3 go right | 4 go forward | 5 trigger")
                 print(val)
                 # print(xdir)
                 # print(type(val))

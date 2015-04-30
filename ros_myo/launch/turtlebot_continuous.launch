@@ -1,0 +1,8 @@
+<launch>
+
+  <!--node pkg="ros_myo" name="myo_turtlebot_continuous" type="myo-turtlebot-continuous.py"/-->
+  <node pkg="ros_myo" name="myo_turtlebot_move" type="myo-turtlebot-move.py"/>
+
+  <node pkg="ros_myo" name="myo_turtlebot_action" type="myo-turtlebot-action.py"/>
+
+</launch>
