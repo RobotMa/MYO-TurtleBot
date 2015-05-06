@@ -33,7 +33,7 @@ int main(int argc, char** argv){
             geometry_msgs::Twist vel_msg;
 
             try{
-                listener.lookupTransform("/ar_marker_4", "/base_link",
+                listener.lookupTransform("/ar_marker_13", "/base_link",
                    ros::Time(0), transform);
             counter == 0; // set counter back to 0 once find /ar_marker_4
         }
