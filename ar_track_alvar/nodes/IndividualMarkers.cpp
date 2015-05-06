@@ -376,6 +376,14 @@ void getPointCloudCallback (const sensor_msgs::PointCloud2ConstPtr &msg)
       tf::Transform m (tf::Quaternion::getIdentity (), markerOrigin);
       tf::Transform markerPose = t * m; // marker pose in the camera frame
 
+      // Qianli Ma: A small hack: rotate ONLY the marker by 90 degrees around body y-axis
+      // tf::Quaternion q_Y90;
+      // tf::Transform rot_Y90;
+      // q_Y90.setRPY(0, 1.57, 0);
+      // rot_Y90.setRotation(q_Y90);
+      // markerPose = markerPose*rot_Y90;
+      // *********************************** //
+
 	  //Publish the transform from the camera to the marker		
 	  std::string markerFrame = "ar_marker_";
 	  std::stringstream out;
@@ -441,6 +449,8 @@ void getPointCloudCallback (const sensor_msgs::PointCloud2ConstPtr &msg)
 
 	  //Get the pose of the tag in the camera frame, then the output frame (usually torso)				
 	  tf::Transform tagPoseOutput = CamToOutput * markerPose;
+
+    // tagPoseOutput = tagPoseOutput*rot_Y90;
 
 	  //Create the pose marker messages
 	  ar_track_alvar::AlvarMarker ar_pose_marker;

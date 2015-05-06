@@ -46,9 +46,9 @@ def myo_turtlebot_action():
             if guard_action == 1:
                 tbPub.publish(Twist(Vector3(-0.2, 0, 0), Vector3(0, 0, -0)))
             elif guard_action == 2:
-                tbPub.publish(Twist(Vector3(0, 0, 0), Vector3(0, 0, 0.6)))
+                tbPub.publish(Twist(Vector3(0, 0, 0), Vector3(0, 0, 0.8)))
             elif guard_action == 3:
-                tbPub.publish(Twist(Vector3(0, 0, 0), Vector3(0, 0, -0.6)))
+                tbPub.publish(Twist(Vector3(0, 0, 0), Vector3(0, 0, -0.8)))
             elif guard_action == 4:
                 tbPub.publish(Twist(Vector3(0.2, 0, 0), Vector3(0, 0, 0)))
         elif manual == False:
