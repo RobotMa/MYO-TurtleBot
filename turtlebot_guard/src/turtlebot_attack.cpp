@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <tf/transform_listener.h>
 #include <geometry_msgs/Twist.h>
+#include <std_msgs/String.h>
 #include <iostream>
 #include <string>
 
@@ -13,6 +14,7 @@ int main(int argc, char** argv){
 
 	ros::Publisher turtlebot_vel =
 		node.advertise<geometry_msgs::Twist>("mobile_base/commands/velocity", 10);
+	ros::Publisher turtlebot_state = node.advertise<std_msgs::String>("/turtlebot_state", 10);
 	tf::TransformListener listener;
 
 	ros::Rate rate(100.0);
@@ -45,7 +47,9 @@ int main(int argc, char** argv){
 			try{
 				// listener.lookupTransform("/ar_marker_13",    "/odom",
 				//		ros::Time(0), stamped_transform_marker);
-				listener.lookupTransform("/ar_marker_13",   "/base_link",
+				// the enlarged ar tag should be placed no further than 3 tiles 
+				// away from the turtlebot
+				listener.lookupTransform("/base_link", "/ar_marker_13",
 						ros::Time(0), transform);
 
 				counter = 0; // set counter back to 0 once find /ar_marker_4
@@ -59,9 +63,9 @@ int main(int argc, char** argv){
 
 				// turtlebot turns right after missing /ar_marker_13 frame
 				// for every 10 times
-				if (counter == 10){
+				if (counter == 20){
 					vel_msg.angular.z = 1;
-					for (int i = 0; i < 40; i++ ){
+					for (int i = 0; i < 10; i++ ){
 						turtlebot_vel.publish(vel_msg);
 					}
 					counter = 0;
@@ -69,23 +73,45 @@ int main(int argc, char** argv){
 				ros::Duration(1.0).sleep();
 				continue;
 			}
-			
-			
+
+
 			// Rotate /ar_marker_13 by 90 degrees
 			// stamped_transform_marker.operator *=(rot_Y90);
 
 			// Recalculate the ralative transform between /ar_marker_13 and /base_link
 			// transform.inverseTimes(stamped_transform_marker);
-			double scale = 2;
-			double co_vel_ang = 0.02;
+			double scale = 0.20;
+			double co_vel_ang = 0.6;
 
-			vel_msg.angular.z = co_vel_ang * atan2(transform.getOrigin().y(),
-					transform.getOrigin().x());
-			vel_msg.linear.x = scale*co_vel_ang *sqrt(pow(transform.getOrigin().x(), 2) +
-					pow(transform.getOrigin().y(), 2));
+			tf::Quaternion q;
+			q = transform.getRotation();
+			double roll, pitch, yaw;
+			tf::Matrix3x3(q).getRPY(roll, pitch, yaw);	
 
-			std::cout << "Angular Velocity is: " << vel_msg.angular.z << "rad/s " << std::endl;
-			std::cout << "Linear  Velocity is: " << vel_msg.linear.x  << "m/s"    << std::endl;
+			// Note that the battery status of turtlebot can affect its velocity
+			double dist = sqrt(pow(transform.getOrigin().x(), 2) + pow(transform.getOrigin().y(), 2));
+			if (dist > 0.80){
+				vel_msg.angular.z = co_vel_ang * atan2(transform.getOrigin().y(),
+						transform.getOrigin().x());
+				vel_msg.linear.x = scale*co_vel_ang *sqrt(pow(transform.getOrigin().x(), 2) +
+						pow(transform.getOrigin().y(), 2));
+				// turtlebot_state.publish("1st State: Approaching");
+				
+			}
+			else if (dist < 0.80){
+				vel_msg.angular.z = co_vel_ang * atan2(transform.getOrigin().y(),
+						transform.getOrigin().x()) + 0.4*yaw;
+				vel_msg.linear.x = scale*co_vel_ang *sqrt(pow(transform.getOrigin().x(), 2) +
+						pow(transform.getOrigin().y(), 2));
+				// turtlebot_state.publish("2nd State: Near field");
+			}
+
+			std::cout << "Angular Velocity is: " << vel_msg.angular.z << " rad/s " << std::endl;
+			// std::cout << "Relative x is: " << transform.getOrigin().x() << " m" << std::endl;
+			// std::cout << "Relative y is: " << transform.getOrigin().y() << " m" << std::endl;
+			std::cout << "Linear  Velocity is: " << vel_msg.linear.x  << " m/s"    << std::endl;
+			std::cout << "Distance is: " << dist << " m" << std::endl;
+			// std::cout << "Yaw is: " << yaw << " rad" << std::endl; 
 			turtlebot_vel.publish(vel_msg);
 		}
 		rate.sleep();
