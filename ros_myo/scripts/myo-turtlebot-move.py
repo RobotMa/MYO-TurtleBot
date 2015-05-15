@@ -54,23 +54,23 @@ if __name__ == '__main__':
 
         if gest.data == 1: # FIST
 	    turtlebotPub.publish("go back")
-	    # tbPub.publish(Twist(Vector3(-0.2, 0, 0), Vector3(0, 0, 0)))
+	    tbPub.publish(Twist(Vector3(-0.2, 0, 0), Vector3(0, 0, 0)))
 	elif gest.data == 2: # WAVE_IN, RIGHT arm
 	    turtlebotPub.publish("go left")
-	    # tbPub.publish(Twist(Vector3(0, 0, 0), Vector3(0, 0, 0.8)))
+	    tbPub.publish(Twist(Vector3(0, 0, 0), Vector3(0, 0, 0.8)))
         elif gest.data == 2 and armState == 2: #WAVE_IN, LEFT arm
 	    turtlebotPub.publish("go right")
 	    tbPub.publish(Twist(Vector3(0, 0, 0), Vector3(0, 0, -1.0)))
         # elif gest.data == 3 and armState == 1: #WAVE_OUT, RIGHT arm
 	elif gest.data == 3: # WAVE_OUT, RIGHT arm
 	    turtlebotPub.publish("go right")
-	    # tbPub.publish(Twist(Vector3(0, 0, 0), Vector3(0, 0, -0.8)))
+	    tbPub.publish(Twist(Vector3(0, 0, 0), Vector3(0, 0, -0.8)))
         elif gest.data == 3 and armState == 2: # WAVE_OUT, LEFT arm
 	    turtlebotPub.publish("go left")
 	    tbPub.publish(Twist(Vector3(0, 0, 0), Vector3(0, 0, 1.0)))
         elif gest.data == 4: # FINGERS_SPREAD
 	    turtlebotPub.publish("go forward")
-	    # tbPub.publish(Twist(Vector3(0.2, 0, 0), Vector3(0, 0, 0)))
+	    tbPub.publish(Twist(Vector3(0.2, 0, 0), Vector3(0, 0, 0)))
 
     rospy.Subscriber("myo_arm", MyoArm, setArm)
     rospy.Subscriber("myo_gest", UInt8, drive)
